@@ -1,0 +1,90 @@
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+<script>
+    var useragentid = null;
+    var OneSignal = window.OneSignal || [];
+    OneSignal.push(["init", {
+        appId: "d5c24774-cf20-470b-b36f-4ff5cdd46d35",
+      notifyButton: {
+        enable: true,
+      },
+    }]);
+    //Firstly this will check user id 
+    OneSignal.push(function() {
+        OneSignal.getUserId().then(function(userId) {                
+            if(userId == null){
+                document.getElementById('unsubscribe').style.display = 'none';
+            }
+            else{
+                useragentid = userId;
+                document.getElementById('unsubscribe').style.display = '';
+                OneSignal.push(["getNotificationPermission", function(permission){
+                }]);
+                OneSignal.isPushNotificationsEnabled(function(isEnabled) {
+                    if (isEnabled){
+                        document.getElementById('unsubscribe').style.display = '';
+                        document.getElementById('subscribe').style.display = 'none';
+                    }
+                    else{
+                      document.getElementById('unsubscribe').style.display = 'none';
+                      document.getElementById('subscribe').style.display = '';
+                    }
+                });
+            }
+        });
+    });
+    //Secondly this will check when subscription changed
+    OneSignal.push(function() {
+
+        OneSignal.getUserId(function(userId) {
+          console.log("OneSignal User ID:", userId);
+        });;
+
+        OneSignal.on('subscriptionChange', function (isSubscribed) {
+            if(isSubscribed==true){
+                OneSignal.getUserId().then(function(userId) {
+                    useragentid = userId;
+                }).then(function(){
+                 // this is custom function
+                // here you can send post request to php file as well.
+                    OneSignalUserSubscription(userId);
+                });
+                document.getElementById('unsubscribe').style.display = '';
+                document.getElementById('subscribe').style.display = 'none';
+            }
+            else if(isSubscribed==false){
+                OneSignal.getUserId().then(function(userId) {
+                    useragentid = userId;
+                });
+                document.getElementById('unsubscribe').style.display = 'none';
+                document.getElementById('subscribe').style.display = '';
+            }
+            else{
+                console.log('Unable to process the request');
+            }
+        });
+    });
+    function subscribeOneSignal(){
+        if(useragentid !=null){
+            OneSignal.setSubscription(true); 
+        }
+        else{
+            OneSignal.registerForPushNotifications({
+                modalPrompt: true
+            });
+        }
+    }
+    function unSubscribeOneSignal(){
+        OneSignal.setSubscription(false);
+    }
+</script>
+<div id="home-top" class="clearfix">
+<p>OneSingle Testing</p>
+<br>
+<button id="subscribe" class="button" onclick="subscribeOneSignal()">Subscribe </button>
+<button id="unsubscribe" class="button" onclick="unSubscribeOneSignal()">Unsubscribe </button>
+</div>
+<style>
+.button {
+    background-color: #008CBA;border: none;color: white;padding: 15px 32px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;cursor: pointer;
+}
+</style>
