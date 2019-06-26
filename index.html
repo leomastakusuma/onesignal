@@ -2,27 +2,34 @@
 <script>
     var useragentid = null;
     var OneSignal = window.OneSignal || [];
-    OneSignal.push(["init", {
-        appId: "d5c24774-cf20-470b-b36f-4ff5cdd46d35",
-      notifyButton: {
-        enable: true,
-      },
-    }]);
-    //Firstly this will check user id 
     OneSignal.push(function() {
-        OneSignal.getUserId().then(function(userId) {       
-            console.log(userId)
-         
+        OneSignal.init({
+            appId: "d0016e5b-144b-4cf0-b21a-ca243d73ebcb",
+            autoResubscribe: true,
+            notifyButton: {
+            enable: true,
+        },
+            
+        });
+        OneSignal.push(["sendTag", "kucing", "abc"])
+        OneSignal.push(["getTags", function(tags) {
+            console.log("OneSignal getTags:");
+            console.log(tags);
+        }]);
+
+        // subscribeOneSignal()
+
+        OneSignal.getUserId().then(function(userId) {     
+            console.log(userId)  
             if(userId == null){
                 document.getElementById('unsubscribe').style.display = 'none';
+                OneSignal.isPushNotificationsEnabled(function(isEnabled) {
+                    console.log("e")
+                })
             }
             else{
                 useragentid = userId
-                console.log('e')
-                console.log(useragentid)
                 document.getElementById('unsubscribe').style.display = '';
-                OneSignal.push(["getNotificationPermission", function(permission){
-                }]);
                 OneSignal.isPushNotificationsEnabled(function(isEnabled) {
                     if (isEnabled){
                         document.getElementById('unsubscribe').style.display = '';
@@ -33,51 +40,26 @@
                       document.getElementById('subscribe').style.display = '';
                     }
                 });
-            }
-        });
-    });
-    //Secondly this will check when subscription changed
-    OneSignal.push(function() {
-        OneSignal.getUserId(function(userId) {
-          console.log("OneSignal User ID ee:", userId);
-        });;
-
-        OneSignal.on('subscriptionChange', function (isSubscribed) {
-            if(isSubscribed==true){
-                OneSignal.getUserId().then(function(userId) {
-                    useragentid = userId
-                }).then(function(){
-                 // this is custom function
-                // here you can send post request to php file as well.
-                    OneSignalUserSubscription(userId);
-                });
-                document.getElementById('unsubscribe').style.display = '';
-                document.getElementById('subscribe').style.display = 'none';
-            }
-            else if(isSubscribed==false){
-                OneSignal.getUserId().then(function(userId) {
-                    useragentid = userId;
-                });
-                document.getElementById('unsubscribe').style.display = 'none';
-                document.getElementById('subscribe').style.display = '';
-            }
-            else{
-                console.log('Unable to process the request');
-            }
+             }
+        
         });
     });
     function subscribeOneSignal(){
-        console.log(useragentid);
+        console.log("INIT 4")
+        console.log("Proses subscribe")
         if(useragentid !=null){
             OneSignal.setSubscription(true); 
         }
         else{
             OneSignal.registerForPushNotifications({
-                modalPrompt: true
+                modalPrompt: false
             });
         }
     }
     function unSubscribeOneSignal(){
+        console.log("INIT 5")
+
+        console.log('Un Subscribe')
         OneSignal.setSubscription(false);
     }
 </script>
@@ -85,7 +67,7 @@
 <p>OneSingle Testing</p>
 <br>
 <button id="subscribe" class="button" onclick="subscribeOneSignal()">Subscribe </button>
-<button id="unsubscribe" class="button" onclick="unSubscribeOneSignal()">Unsubscribe </button>
+<button id="unsubscribe" class="button" onclick="unSubscribeOneSignal()">Unsubscribe  </button>
 </div>
 <style>
 .button {
