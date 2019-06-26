@@ -10,12 +10,16 @@
     }]);
     //Firstly this will check user id 
     OneSignal.push(function() {
-        OneSignal.getUserId().then(function(userId) {                
+        OneSignal.getUserId().then(function(userId) {       
+            console.log(userId)
+         
             if(userId == null){
                 document.getElementById('unsubscribe').style.display = 'none';
             }
             else{
-                useragentid = userId;
+                useragentid = userId
+                console.log('e')
+                console.log(useragentid)
                 document.getElementById('unsubscribe').style.display = '';
                 OneSignal.push(["getNotificationPermission", function(permission){
                 }]);
@@ -34,15 +38,14 @@
     });
     //Secondly this will check when subscription changed
     OneSignal.push(function() {
-
         OneSignal.getUserId(function(userId) {
-          console.log("OneSignal User ID:", userId);
+          console.log("OneSignal User ID ee:", userId);
         });;
 
         OneSignal.on('subscriptionChange', function (isSubscribed) {
             if(isSubscribed==true){
                 OneSignal.getUserId().then(function(userId) {
-                    useragentid = userId;
+                    useragentid = userId
                 }).then(function(){
                  // this is custom function
                 // here you can send post request to php file as well.
@@ -64,6 +67,7 @@
         });
     });
     function subscribeOneSignal(){
+        console.log(useragentid);
         if(useragentid !=null){
             OneSignal.setSubscription(true); 
         }
