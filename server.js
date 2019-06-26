@@ -45,8 +45,6 @@ app.use(function (req, res, next) {
     });
     return;
 });
-
-
 var port = 8081;
 try {
     app.listen(8081, '0.0.0.0', function () {
